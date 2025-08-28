@@ -1,6 +1,11 @@
+//import { gql } from "@apollo/client"
+//import { useQuery } from "@apollo/client/react"
+
 type DashboardProps = {
     symbol: string
 }
+
+
 
 const Dashboard = ({symbol}: DashboardProps) =>{
     return(
