@@ -12,6 +12,7 @@ const HeaderSearch = ({onSearchSubmit}: HeaderSearchProps) => {
         if (inputValue.trim()){
             onSearchSubmit(inputValue.trim().toUpperCase())
         }
+        setInputValue("")
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) =>{

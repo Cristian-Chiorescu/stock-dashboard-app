@@ -7,18 +7,15 @@ type HeaderProps={
 const Header = ({onSearchSubmit}:HeaderProps) =>{
     return(
         <header className="p-4">
-      {/* A wrapper to control width and centering, matching the dashboard */}
-      <div className="max-w-screen-xl mx-auto flex justify-between items-center px-2 md:px-8">
+      <div className="max-w-screen-xl mx-auto flex justify-between items-center gap-10 px-2 md:px-8">
         
-        {/* Left Side: Logo */}
         <div>
-          <a href="#" aria-label="Home">
+          <a className="font-pacifico bg-linear-140 from-cyan-300 to-indigo-300 bg-clip-text text-transparent" href="https://cristianchiorescu.com/" target="_blank" aria-label="Portfolio">
             CristianChiorescu
           </a>
         </div>
 
-        {/* Right Side: Search Bar */}
-        <div className="w-full max-w-xs">
+        <div className="w-xs">
           <HeaderSearch onSearchSubmit={onSearchSubmit} />
         </div>
 

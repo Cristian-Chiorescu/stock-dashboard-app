@@ -13,13 +13,13 @@ function App() {
   const [symbol, setSymbol] = useState<string|null>(null)
 
   return (
-    <div className='min-h-screen flex flex-col text-white animated-gradient-bg'>
+    <div className='min-h-screen flex flex-col text-white font-inter animated-gradient-bg'>
       {symbol?(<Header onSearchSubmit={setSymbol}/>):("")}
       <main className={`flex-1 ${
     symbol ? "" : "flex items-center justify-center"
   }`}>
         {symbol?(
-          <Dashboard symbol={symbol}/>
+          <Dashboard symbol={symbol} setSymbol={setSymbol}/>
         ):( 
       <WelcomeSearch onSearchSubmit={setSymbol}/>
       )}

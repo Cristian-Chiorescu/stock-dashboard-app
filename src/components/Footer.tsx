@@ -6,9 +6,9 @@ const Footer = () =>{
     const currentYear = new Date().getFullYear()
     
     return(
-        <footer className='w-full bg-gray-900 text-white p-2 text-center'>
-      <div >
-        <ul className='list-none p-0 mb- flex justify-center gap-4'>
+        <footer className='text-sm  w-full bg-gray-900 text-gray-300 p-6 text-center'>
+      <div>
+        <ul className='list-none p-0 mb-4 flex justify-center gap-4'>
           <li>
             <a
               href="https://github.com/Cristian-Chiorescu"

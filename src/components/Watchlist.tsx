@@ -1,13 +1,18 @@
 import WatchlistItem from "./WatchlistItem"
 import GlassPanel from "./GlassPanel"
+import { mockWatchlist } from "./mockData"
 
-const Watchlist = () =>{
+type WatchlistProps = {
+    setSymbol: (symbol:string) => void
+}
+
+const Watchlist = ({setSymbol}:WatchlistProps) =>{
     return(
-        <GlassPanel className="m-4">
+        <GlassPanel>
         <div className="grid md:grid-cols-1 sm:grid-cols-2 gap-6">
-               <WatchlistItem/>
-                <WatchlistItem/>
-                <WatchlistItem/>
+               {mockWatchlist.map(stockSymbol => (
+                <WatchlistItem key={stockSymbol} symbol={stockSymbol} setSymbol={setSymbol}/>
+               ))}
         </div>
         </GlassPanel>
         

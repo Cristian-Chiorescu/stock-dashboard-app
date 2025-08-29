@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client"
 import { useQuery } from "@apollo/client/react"
-
+import { mockStockDetails } from "./mockData"
 import KeyInfoCard from "./KeyInfoCard"
 import MainChart from "./MainChart"
 import StatisticsCard from "./StatisticsCard"
@@ -28,34 +28,21 @@ const GET_STOCK_DETAILS = gql`
     }
 `
 
-const mockStockData = {
-    stock: {
-    name: "Apple Inc.",
-    symbol: "AAPL",
-    quote: {
-      price: 175.50,
-      change: 2.75,
-      percentChange: 1.59,
-    },
-    stats: {
-      marketCap: 2800000000000, // 2.8 Trillion
-      peRatio: 29.5,
-      week52High: 198.23,
-      week52Low: 155.45,
-      volume: 52000000,
-    },
-  },
-}
 
 type DashboardProps = {
-    symbol: string
+    symbol: string,
+    setSymbol: (symbol:string) => void
 }
 
-const Dashboard = ({symbol}: DashboardProps) =>{
+const Dashboard = ({symbol, setSymbol}: DashboardProps) =>{
 
-    const loading: boolean = false
-    const error:undefined = undefined
-    const data = mockStockData
+    const loading = false
+    const error = undefined
+    const data = mockStockDetails[symbol]
+
+    if (!data) {
+    return <p className="text-center p-8">Data not found for symbol: {symbol}</p>;
+    }
 
     if(loading){
         return <p className="text-center mt-8">Loading data...</p>
@@ -69,12 +56,12 @@ const Dashboard = ({symbol}: DashboardProps) =>{
         <div className="max-w-screen-xl mx-auto p-4 md:p-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 flex flex-col gap-6">
-                <KeyInfoCard/>
-                <MainChart/>
-                <StatisticsCard/>
+                <KeyInfoCard name={data.name} symbol={data.symbol} quote={data.quote}/>
+                <MainChart chartData={data.chart}/>
+                <StatisticsCard stats={data.stats}/>
             </div>
             <div className="md:col-span-1">
-                <Watchlist/>
+                <Watchlist setSymbol={setSymbol}/>
             </div>
         </div>
         </div>

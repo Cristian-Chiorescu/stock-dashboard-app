@@ -1,4 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Pacifico&display=swap");
+
 @import "tailwindcss";
+
+@theme {
+  --font-pacifico: "Pacifico", sans-serif;
+  --font-inter: "Inter", sans-serif;
+}
 
 .animated-gradient-bg {
   background-color: #0f172a;
