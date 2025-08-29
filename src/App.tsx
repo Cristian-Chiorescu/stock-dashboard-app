@@ -4,21 +4,27 @@ import { useState } from 'react'
 //import { Chart as ChartJs } from 'chart.js'
 
 import WelcomeSearch from './components/WelcomeSearch'
+import Header from './components/Header'
 import Dashboard from './components/Dashboard'
+import Footer from './components/Footer'
 
 
 function App() {
   const [symbol, setSymbol] = useState<string|null>(null)
 
   return (
-    <div className='min-h-screen flex flex-col bg-gray-100'>
-      <main className='flex-1 flex flex-col'>
+    <div className='min-h-screen flex flex-col text-white animated-gradient-bg'>
+      {symbol?(<Header onSearchSubmit={setSymbol}/>):("")}
+      <main className={`flex-1 ${
+    symbol ? "" : "flex items-center justify-center"
+  }`}>
         {symbol?(
           <Dashboard symbol={symbol}/>
-        ):(
+        ):( 
       <WelcomeSearch onSearchSubmit={setSymbol}/>
       )}
       </main>
+      <Footer/>
     </div>
   )
 }
