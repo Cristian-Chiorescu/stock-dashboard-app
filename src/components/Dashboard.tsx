@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { gql } from "@apollo/client"
 import { useQuery } from "@apollo/client/react"
 import { mockStockDetails } from "./mockData"
@@ -7,7 +8,7 @@ import StatisticsCard from "./StatisticsCard"
 import Watchlist from "./Watchlist"
 
 
-const GET_STOCK_DETAILS = gql`
+/*const GET_STOCK_DETAILS = gql`
     query GetStockDetails($symbol: String!){
         stock(symbol: $symbol){
             name
@@ -26,8 +27,24 @@ const GET_STOCK_DETAILS = gql`
             }
         }
     }
-`
+`*/
 
+interface LiveStockData {
+  name: string;
+  symbol: string;
+  quote: {
+    price: number;
+    change: number;
+    percentChange: number;
+  };
+  stats: {
+    marketCap: number;
+    peRatio: number;
+    week52High: number;
+    week52Low: number;
+    volume: number;
+  };
+}
 
 type DashboardProps = {
     symbol: string,
@@ -36,28 +53,45 @@ type DashboardProps = {
 
 const Dashboard = ({symbol, setSymbol}: DashboardProps) =>{
 
-    const loading = false
-    const error = undefined
-    const data = mockStockDetails[symbol]
+   const [data, setData] = useState<LiveStockData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    if (!data) {
-    return <p className="text-center p-8">Data not found for symbol: {symbol}</p>;
-    }
+   useEffect(() => {
+    if (!symbol) return;
 
-    if(loading){
-        return <p className="text-center mt-8">Loading data...</p>
-    }
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`/.netlify/functions/getStockData?symbol=${symbol}`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const result = await response.json();
+        setData(result);
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if(error){
-        return <p className="text-center mt-8 text-red-500">Error: Could not fetch data for {symbol}</p>
-    }
+    fetchData();
+  }, [symbol]);
+
+    if (loading) return <p className="text-center p-8">Loading live data for {symbol}...</p>;
+  if (error) return <p className="text-center p-8 text-red-400">Error: {error}</p>;
+  if (!data) return null;
+
+ const chartData = mockStockDetails[symbol]?.chart;
 
     return(
         <div className="max-w-screen-xl mx-auto p-4 md:p-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 flex flex-col gap-6">
                 <KeyInfoCard name={data.name} symbol={data.symbol} quote={data.quote}/>
-                <MainChart chartData={data.chart}/>
+                {chartData && <MainChart chartData={chartData}/>}
                 <StatisticsCard stats={data.stats}/>
             </div>
             <div className="md:col-span-1">
