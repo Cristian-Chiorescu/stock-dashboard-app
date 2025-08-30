@@ -83,11 +83,4 @@ export default Dashboard
 
 
 
-/*<div className="flex flex-col items-center gap-10">
-            <h1 className="text-4xl font-bold mb-4">{data.stock.name} ({data.stock.symbol})</h1>
-            <div className="p-4 border rounded-lg max-w-xl">
-                <p className="text-2xl">Price: ${data.stock.quote.price.toFixed(2)}</p>
-                <p className="text-lg">Change: ${data.stock.quote.change.toFixed(2)} ({data.stock.quote.percentChange.toFixed(2)}%)</p>
-                <p>Market Cap: ${(data.stock.stats.marketCap / 1e12).toFixed(2)}T</p>
-            </div>
-        </div>*/
+// Triggering a new Netlify deploy
