@@ -41,7 +41,7 @@ const Dashboard = ({symbol, setSymbol}: DashboardProps) =>{
     const data = mockStockDetails[symbol]
 
     if (!data) {
-    return <p className="text-center p-8">Data not found for symbol: {symbol}</p>;
+    return <p className="text-center p-8">Data not found for symbol: {symbol} | Try searching for AAPL</p>;
     }
 
     if(loading){
