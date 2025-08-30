@@ -1,5 +1,3 @@
-import { gql } from "@apollo/client"
-import { useQuery } from "@apollo/client/react"
 import { mockStockDetails } from "./mockData"
 import KeyInfoCard from "./KeyInfoCard"
 import MainChart from "./MainChart"
@@ -7,26 +5,6 @@ import StatisticsCard from "./StatisticsCard"
 import Watchlist from "./Watchlist"
 
 
-const GET_STOCK_DETAILS = gql`
-    query GetStockDetails($symbol: String!){
-        stock(symbol: $symbol){
-            name
-            symbol
-            quote{
-                price
-                change
-                percentChange
-                }
-            stats{
-                marketCap
-                peRatio
-                week52High
-                week52Low
-                volume
-            }
-        }
-    }
-`
 
 
 type DashboardProps = {
