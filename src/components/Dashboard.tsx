@@ -39,12 +39,15 @@ const Dashboard = ({symbol, setSymbol}: DashboardProps) =>{
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+      setData(null);
       try {
         const response = await fetch(`/.netlify/functions/getStockData?symbol=${symbol}`);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
         const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to fetch data');
+        }
+
         setData(result);
       } catch (e: any) {
         setError(e.message);

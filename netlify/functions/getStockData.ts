@@ -47,7 +47,13 @@ export const handler: Handler = async (event: HandlerEvent) => {
 
     const quoteData = await quoteResponse.json();
     const profileData = await profileResponse.json();
-    console.log("Data fetched successfully.");
+    
+    if (!profileData.name) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: `Stock symbol '${symbol}' not found.` }),
+      };
+    }
 
     const combinedData = {
       name: profileData.name,
