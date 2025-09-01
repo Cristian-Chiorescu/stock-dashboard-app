@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { mockWatchlist } from "./mockData"
 
 type WelcomeSearchProps = {
     onSearchSubmit: (symbol:string) => void
@@ -18,6 +19,8 @@ const WelcomeSearch = ({onSearchSubmit}: WelcomeSearchProps) => {
         setInputValue(event.target.value)
     }
 
+    const placeholderText = `Search for a stock (e.g., ${mockWatchlist.slice(0,3).join(', ')})`
+
     return(
         
             <div className="w-full max-w-3xl px-4">
@@ -29,7 +32,7 @@ const WelcomeSearch = ({onSearchSubmit}: WelcomeSearchProps) => {
 </svg>
             </button>
             </div>
-            <input className="w-full py-3 pl-12 pr-4 border border-gray-300 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500" type="text" value={inputValue}  onChange={handleChange} placeholder="Search for a stock symbol (e.g., AAPL)"/>
+            <input className="w-full py-3 pl-12 pr-4 border border-gray-300 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500" type="text" value={inputValue}  onChange={handleChange} placeholder={placeholderText}/>
         </form>
         </div>
 
