@@ -3,7 +3,8 @@ import KeyInfoCard from "./KeyInfoCard"
 import MainChart from "./MainChart"
 import StatisticsCard from "./StatisticsCard"
 import Watchlist from "./Watchlist"
-
+import { useStock } from "../hooks/useStock"
+import KeyInfoCardLive from "./KeyInfoCardLive"
 
 
 
@@ -14,8 +15,10 @@ type DashboardProps = {
 
 const Dashboard = ({symbol, setSymbol}: DashboardProps) =>{
 
+    const { data: live, status, error, lastUpdated, refresh } = useStock(symbol, { refreshMs: 15000 })
+
     const loading = false
-    const error = undefined
+    const err = undefined
     const data = mockStockDetails[symbol]
 
     if (!data) {
@@ -26,7 +29,7 @@ const Dashboard = ({symbol, setSymbol}: DashboardProps) =>{
         return <p className="text-center mt-8">Loading data...</p>
     }
 
-    if(error){
+    if(err){
         return <p className="text-center mt-8 text-red-500">Error: Could not fetch data for {symbol}</p>
     }
 
@@ -34,7 +37,8 @@ const Dashboard = ({symbol, setSymbol}: DashboardProps) =>{
         <div className="max-w-screen-xl mx-auto p-4 md:p-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 flex flex-col gap-6">
-                <KeyInfoCard name={data.name} symbol={data.symbol} quote={data.quote}/>
+                <KeyInfoCardLive data={live} status={status} error={error} lastUpdated={lastUpdated} onRefresh={refresh}/>
+                 <KeyInfoCard name={data.name} symbol={data.symbol} quote={data.quote}/>
                 <MainChart chartData={data.chart}/>
                 <StatisticsCard stats={data.stats}/>
             </div>
