@@ -1,67 +1,69 @@
 // src/hooks/useStock.ts
 import { useEffect, useRef, useState } from "react";
 import type { StockResponse } from "../types/stock";
-import { fetchStock } from "../lib/api";
+import { fetchStock, type Provider } from "../lib/api";
 
 type Status = "idle" | "loading" | "ok" | "error";
 
 type Options = {
-  /** Polling interval in ms. Use 0 or undefined to disable polling. */
   refreshMs?: number;
-  /**
-   * Optional initial data to render immediately (e.g., from your mock).
-   * Pass either the object or a function returning it, so we don't compute it on every render.
-   */
-  initial?: StockResponse | (() => StockResponse);
-  /** Optional error callback */
   onError?: (err: unknown) => void;
 };
 
 export function useStock(symbol: string, opts: Options = {}) {
-  const { refreshMs = 15000, initial, onError } = opts;
+  const { refreshMs = 15000, onError } = opts;
 
-  const initialValue =
-    typeof initial === "function" ? (initial as () => StockResponse)() : initial;
-
-  const [data, setData] = useState<StockResponse | null>(initialValue ?? null);
-  const [status, setStatus] = useState<Status>(initialValue ? "ok" : "idle");
+  const [data, setData] = useState<StockResponse | null>(null);
+  const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<number | null>(
-    initialValue?._meta?.ts ?? null
-  );
+  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
 
   const timerRef = useRef<number | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const prevSymbolRef = useRef<string>("");
 
-  const doFetch = async () => {
-    // Cancel any in-flight request for an old symbol
+  async function doFetch(options: { withCandles?: boolean; provider?: Provider } = {}) {
+    // cancel any in-flight request
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setStatus((s) => (s === "ok" ? "ok" : "loading")); // keep UI stable if we already have data
+    setStatus((s) => (s === "ok" ? "ok" : "loading")); // keep UI steady if we already have data
 
     try {
-      const next = await fetchStock(symbol);
+      const next = await fetchStock(symbol, {
+        withCandles: options.withCandles,
+        provider: options.provider,
+      });
       if (controller.signal.aborted) return;
 
-      setData(next);
+      setData((old) => {
+        // If we skipped candles this time, preserve previous daily array
+        if (options.withCandles === false && old?.daily?.length && !next.daily?.length) {
+          return { ...next, daily: old.daily };
+        }
+        return next;
+      });
       setStatus("ok");
       setError(null);
       setLastUpdated(next?._meta?.ts ?? Date.now());
     } catch (e: any) {
       if (controller.signal.aborted) return;
-
-      setStatus((s) => (data ? "ok" : "error")); // keep last good data if we have it
+      setStatus((s) => (data ? "ok" : "error"));
       setError(e?.message || "Unknown error");
       onError?.(e);
     }
-  };
+  }
 
-  // Kick off fetch when symbol changes
+  // On symbol change: fetch once WITH candles (prefer stooq to avoid quotas)
   useEffect(() => {
     if (!symbol?.trim()) return;
-    doFetch();
+
+    if (symbol !== prevSymbolRef.current) {
+      prevSymbolRef.current = symbol;
+    }
+
+    doFetch({ withCandles: true, provider: "stooq" });
 
     return () => {
       abortRef.current?.abort();
@@ -69,13 +71,14 @@ export function useStock(symbol: string, opts: Options = {}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol]);
 
-  // Polling
+  // Poll QUOTES only (no candles) to avoid daily limits
   useEffect(() => {
     if (!refreshMs) return;
 
     timerRef.current = window.setInterval(() => {
-      // Only poll if we have a symbol
-      if (symbol?.trim()) doFetch();
+      if (symbol?.trim()) {
+        doFetch({ withCandles: false });
+      }
     }, refreshMs) as unknown as number;
 
     return () => {
@@ -84,7 +87,8 @@ export function useStock(symbol: string, opts: Options = {}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol, refreshMs]);
 
-  const refresh = () => doFetch();
+  const refresh = (withCandles = false, provider?: Provider) =>
+    doFetch({ withCandles, provider });
 
   return { data, status, error, lastUpdated, refresh };
 }

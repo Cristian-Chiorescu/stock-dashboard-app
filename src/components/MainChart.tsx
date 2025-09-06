@@ -94,7 +94,7 @@ const MainChart = ({chartData}: MainChartProps) =>{
 
     return(
         <GlassPanel>
-    
+    <div className="text-xs text-amber-600">Chart source: MOCK</div>
       <div className="flex justify-end gap-2 mb-4">
         <button className={getButtonClass("1D")} onClick={() => setTimeFrame("1D")}>1D</button>
         <button className={getButtonClass("5D")} onClick={() => setTimeFrame("5D")}>5D</button>

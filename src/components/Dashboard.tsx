@@ -5,7 +5,10 @@ import StatisticsCard from "./StatisticsCard"
 import Watchlist from "./Watchlist"
 import { useStock } from "../hooks/useStock"
 import KeyInfoCardLive from "./KeyInfoCardLive"
-
+import MainChartLive from "./MainChartLive"
+import StatisticsCardLive from "./StatisticsCardLive"
+import WatchlistLive from "./WatchlistLive";
+import GlassPanel from "./GlassPanel"
 
 
 type DashboardProps = {
@@ -15,35 +18,62 @@ type DashboardProps = {
 
 const Dashboard = ({symbol, setSymbol}: DashboardProps) =>{
 
-    const { data: live, status, error, lastUpdated, refresh } = useStock(symbol, { refreshMs: 15000 })
+    const { data: live, status, error, lastUpdated, refresh } = useStock(symbol, {
+  refreshMs: 60000, // 60s polling to avoid AV rate-limits
+});
 
-    const loading = false
-    const err = undefined
-    const data = mockStockDetails[symbol]
 
-    if (!data) {
-    return <p className="text-center p-8">Data not found for symbol: {symbol} | Try searching for AAPL</p>;
-    }
+    const data = mockStockDetails[symbol] // mock (may be undefined)
 
-    if(loading){
-        return <p className="text-center mt-8">Loading data...</p>
-    }
+  // Make a clean, filtered list of live points (guard against NaNs)
+const livePoints = (live?.daily ?? []).filter(d => Number.isFinite(d?.c));
+const hasLiveDaily = livePoints.length >= 2;
+const hasMock = !!data;
+const liveStatsReady =
+  !!live?.stats &&
+  (
+    (live.stats.marketCap ?? 0) !== 0 ||
+    (live.stats.week52High ?? 0) !== 0 ||
+    (live.stats.week52Low ?? 0) !== 0 ||
+    (live.stats.volume ?? 0) !== 0 ||
+    (live.stats.peRatio ?? 0) !== 0
+  );
 
-    if(err){
-        return <p className="text-center mt-8 text-red-500">Error: Could not fetch data for {symbol}</p>
-    }
 
     return(
         <div className="max-w-screen-xl mx-auto p-4 md:p-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2 flex flex-col gap-6">
                 <KeyInfoCardLive data={live} status={status} error={error} lastUpdated={lastUpdated} onRefresh={refresh}/>
-                 <KeyInfoCard name={data.name} symbol={data.symbol} quote={data.quote}/>
-                <MainChart chartData={data.chart}/>
-                <StatisticsCard stats={data.stats}/>
+                 {/*<KeyInfoCard name={data.name} symbol={data.symbol} quote={data.quote}/>*/}
+                
+                {hasLiveDaily ? (
+  <>
+  <MainChartLive symbol={live!.symbol} daily={livePoints} />
+    
+  </>
+) : hasMock ? (
+  <>
+  <MainChart chartData={data.chart} />
+    
+  </>
+) : (
+  <div className="rounded-2xl shadow p-6 bg-white border border-gray-100 text-sm text-gray-600">
+    Chart source: NONE (no live candles / no mock)
+  </div>
+)}
+                {liveStatsReady ? (
+  <StatisticsCardLive stats={live!.stats} />
+) : hasMock ? (
+  <StatisticsCard stats={data.stats} />
+) : (
+  <div className="rounded-2xl shadow p-6 bg-white border border-gray-100 text-sm text-gray-600">
+    Live stats unavailable for this symbol on the current provider. Try another ticker or refresh later.
+  </div>
+)}
             </div>
             <div className="md:col-span-1">
-                <Watchlist setSymbol={setSymbol}/>
+                <WatchlistLive setSymbol={setSymbol}/>
             </div>
         </div>
         </div>
