@@ -24,7 +24,7 @@ export default function WatchlistLive({ setSymbol, symbols }: Props) {
           <h3 className="text-xl font-bold text-white">Watchlist</h3>
         </div>
         <button
-          className="text-xs px-2 py-1 rounded-md border border-white/10 hover:bg-white/10"
+          className="text-sm px-3 py-1 mb-4 rounded-lg border hover:bg-white/20 cursor-pointer"
           onClick={refresh}
         >
           Refresh

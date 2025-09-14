@@ -47,7 +47,9 @@ export default function KeyInfoCardLive({
           <div className="text-sm text-gray-400">Live</div>
           <h2 className="text-xl font-semibold">
             {data?.name ?? "—"}{" "}
-            <span className="text-gray-300 text-base">({data?.symbol ?? "—"})</span>
+            <span className="text-gray-300 text-base">
+              ({data?.symbol ?? "—"})
+            </span>
           </h2>
         </div>
         <button
@@ -78,19 +80,27 @@ export default function KeyInfoCardLive({
       <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
         <div>
           <div className="text-gray-400">Open</div>
-          <div className="font-medium">{formatCurrency(data?.quote?.open ?? null)}</div>
+          <div className="font-medium">
+            {formatCurrency(data?.quote?.open ?? null)}
+          </div>
         </div>
         <div>
           <div className="text-gray-400">High</div>
-          <div className="font-medium">{formatCurrency(data?.quote?.high ?? null)}</div>
+          <div className="font-medium">
+            {formatCurrency(data?.quote?.high ?? null)}
+          </div>
         </div>
         <div>
           <div className="text-gray-400">Low</div>
-          <div className="font-medium">{formatCurrency(data?.quote?.low ?? null)}</div>
+          <div className="font-medium">
+            {formatCurrency(data?.quote?.low ?? null)}
+          </div>
         </div>
         <div>
           <div className="text-gray-400">Prev Close</div>
-          <div className="font-medium">{formatCurrency(data?.quote?.prevClose ?? null)}</div>
+          <div className="font-medium">
+            {formatCurrency(data?.quote?.prevClose ?? null)}
+          </div>
         </div>
       </div>
 
@@ -110,7 +120,7 @@ export default function KeyInfoCardLive({
       </div>
 
       {status === "error" && (
-        <div className="mt-3 text-xs text-red-600">Error: {error}</div>
+        <div className="mt-3 text-xs text-red-400">Error: {error}</div>
       )}
     </GlassPanel>
   );

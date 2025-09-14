@@ -70,7 +70,11 @@ const Dashboard = ({ symbol, setSymbol }: DashboardProps) => {
               <MainChart chartData={data.chart} />
             </>
           ) : (
-            <div className="rounded-2xl shadow p-6 bg-white border border-gray-100 text-sm text-gray-600">
+            <div
+              className="bg-black/10 backdrop-blur-lg rounded-xl shadow-lg
+        border border-white/10
+        p-6"
+            >
               Chart source: NONE (no live candles / no mock)
             </div>
           )}
@@ -82,7 +86,11 @@ const Dashboard = ({ symbol, setSymbol }: DashboardProps) => {
           ) : hasMock ? (
             <StatisticsCard stats={data.stats} />
           ) : (
-            <div className="rounded-2xl shadow p-6 bg-white border border-gray-100 text-sm text-gray-600">
+            <div
+              className="bg-black/10 backdrop-blur-lg rounded-xl shadow-lg
+        border border-white/10
+        p-6"
+            >
               Live stats unavailable for this symbol on the current provider.
               Try another ticker or refresh later.
             </div>
