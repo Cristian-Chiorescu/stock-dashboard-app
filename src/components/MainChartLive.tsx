@@ -27,23 +27,27 @@ ChartJS.register(
 
 type Props = {
   symbol: string;
-  daily: Candle[]; // live daily candles (may be empty)
+  daily: Candle[];
 };
 
-// Approximate trading-day windows (fallback until you add intraday):
 const TF_WINDOWS: Record<"1D" | "5D" | "1M" | "6M" | "1Y", number> = {
-  "1D": 2,    // need at least 2 points to draw a line
+  "1D": 2,
   "5D": 5,
-  "1M": 22,   // ~22 trading days
-  "6M": 126,  // ~126 trading days
-  "1Y": 252,  // ~252 trading days
+  "1M": 22,
+  "6M": 126,
+  "1Y": 252,
 };
 
 const fmtLabel = (ms: number) =>
-  new Date(ms).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  new Date(ms).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
 
 export default function MainChartLive({ symbol, daily }: Props) {
-  const [timeframe, setTimeframe] = useState<"1D" | "5D" | "1M" | "6M" | "1Y">("1Y");
+  const [timeframe, setTimeframe] = useState<"1D" | "5D" | "1M" | "6M" | "1Y">(
+    "1Y"
+  );
 
   const series = useMemo(() => {
     const needed = TF_WINDOWS[timeframe];
@@ -90,7 +94,12 @@ export default function MainChartLive({ symbol, daily }: Props) {
         backgroundColor: (context: any) => {
           const { ctx, chartArea } = context.chart;
           if (!chartArea) return "rgba(56, 189, 248, 0.25)";
-          const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          const gradient = ctx.createLinearGradient(
+            0,
+            chartArea.top,
+            0,
+            chartArea.bottom
+          );
           gradient.addColorStop(0, "rgba(56, 189, 248, 0.5)");
           gradient.addColorStop(1, "rgba(56, 189, 248, 0)");
           return gradient;
@@ -110,30 +119,53 @@ export default function MainChartLive({ symbol, daily }: Props) {
     }`;
 
   return (
-  <GlassPanel>
-    
-    <div className="flex justify-between">
+    <GlassPanel>
+      <div className="flex justify-between">
         <div className="text-sm text-gray-400">Live</div>
-    <div className="flex justify-end gap-2 mb-4">
-        
-      <button className={getButtonClass("1D")} onClick={() => setTimeframe("1D")}>1D</button>
-      <button className={getButtonClass("5D")} onClick={() => setTimeframe("5D")}>5D</button>
-      <button className={getButtonClass("1M")} onClick={() => setTimeframe("1M")}>1M</button>
-      <button className={getButtonClass("6M")} onClick={() => setTimeframe("6M")}>6M</button>
-      <button className={getButtonClass("1Y")} onClick={() => setTimeframe("1Y")}>1Y</button>
-    </div>
-    </div>
-
-    <div className="h-48 sm:h-60">
-      {series.count >= 2 ? (
-        <Line options={options} data={dataForChart} />
-      ) : (
-        <div className="h-full flex items-center justify-center text-sm text-gray-300">
-          Not enough live data for this timeframe yet. Try a longer range or press Refresh.
+        <div className="flex justify-end gap-2 mb-4">
+          <button
+            className={getButtonClass("1D")}
+            onClick={() => setTimeframe("1D")}
+          >
+            1D
+          </button>
+          <button
+            className={getButtonClass("5D")}
+            onClick={() => setTimeframe("5D")}
+          >
+            5D
+          </button>
+          <button
+            className={getButtonClass("1M")}
+            onClick={() => setTimeframe("1M")}
+          >
+            1M
+          </button>
+          <button
+            className={getButtonClass("6M")}
+            onClick={() => setTimeframe("6M")}
+          >
+            6M
+          </button>
+          <button
+            className={getButtonClass("1Y")}
+            onClick={() => setTimeframe("1Y")}
+          >
+            1Y
+          </button>
         </div>
-      )}
-    </div>
-  </GlassPanel>
-);
-}
+      </div>
 
+      <div className="h-48 sm:h-60">
+        {series.count >= 2 ? (
+          <Line options={options} data={dataForChart} />
+        ) : (
+          <div className="h-full flex items-center justify-center text-sm text-gray-300">
+            Not enough live data for this timeframe yet. Try a longer range or
+            press Refresh.
+          </div>
+        )}
+      </div>
+    </GlassPanel>
+  );
+}

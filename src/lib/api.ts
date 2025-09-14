@@ -1,13 +1,14 @@
-// src/lib/api.ts
 import type { StockResponse } from "../types/stock";
 
 export type Provider = "fh" | "fmp" | "av" | "stooq";
 
 export async function fetchStock(
   symbol: string,
-  opts?: { withCandles?: boolean; provider?: Provider }
+  opts?: { withCandles?: boolean; provider?: Provider },
+  signal?: AbortSignal
 ): Promise<StockResponse> {
-  if (!symbol || !symbol.trim()) throw new Error("fetchStock: symbol is required");
+  if (!symbol || !symbol.trim())
+    throw new Error("fetchStock: symbol is required");
 
   const params = new URLSearchParams({ symbol: symbol.trim().toUpperCase() });
   if (opts?.withCandles === false) params.set("candles", "0"); // default is 1 on the server
@@ -17,6 +18,7 @@ export async function fetchStock(
   const res = await fetch(url, {
     headers: { Accept: "application/json" },
     cache: "no-store",
+    signal,
   });
 
   if (!res.ok) {
@@ -34,4 +36,3 @@ export async function fetchStock(
   }
   return data;
 }
-

@@ -3,8 +3,6 @@ import { mockStockDetails } from "./mockData";
 type WatchlistItemProps = {
   symbol: string;
   setSymbol: (symbol: string) => void;
-
-  // NEW: optional live values (when provided, they override mock)
   name?: string | null;
   price?: number | null;
   change?: number | null;
@@ -35,16 +33,14 @@ const WatchlistItem = ({
 }: WatchlistItemProps) => {
   const mock = mockStockDetails[symbol];
 
-  // Prefer live props if present; otherwise fall back to mock
   const displayName = name ?? mock?.name ?? symbol;
-  const displayPrice = (price ?? mock?.quote?.price) ?? null;
-  const displayChange = (change ?? mock?.quote?.change) ?? null;
-  const displayPct = (percentChange ?? mock?.quote?.percentChange) ?? null;
+  const displayPrice = price ?? mock?.quote?.price ?? null;
+  const displayChange = change ?? mock?.quote?.change ?? null;
+  const displayPct = percentChange ?? mock?.quote?.percentChange ?? null;
 
   const isUp = typeof displayChange === "number" && displayChange > 0;
   const isDown = typeof displayChange === "number" && displayChange < 0;
 
-  // If neither live nor mock exist for this symbol, hide the row
   if (!mock && displayPrice == null && displayPct == null) return null;
 
   return (
@@ -68,9 +64,13 @@ const WatchlistItem = ({
             !isUp && !isDown ? "text-white/70" : "",
           ].join(" ")}
         >
-          {displayChange != null && isFinite(displayChange) && displayChange >= 0 ? "+" : ""}
-          {typeof displayChange === "number" ? displayChange.toFixed(2) : "—"}{" "}
-          ({fmtPct(displayPct)})
+          {displayChange != null &&
+          isFinite(displayChange) &&
+          displayChange >= 0
+            ? "+"
+            : ""}
+          {typeof displayChange === "number" ? displayChange.toFixed(2) : "—"} (
+          {fmtPct(displayPct)})
         </p>
       </div>
     </div>

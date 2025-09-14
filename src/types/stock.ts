@@ -1,12 +1,10 @@
-// src/types/stock.ts
-
 export type Candle = {
-  t: number;   // timestamp in ms
-  o: number;   // open
-  h: number;   // high
-  l: number;   // low
-  c: number;   // close
-  v?: number;  // volume (optional)
+  t: number; // timestamp in ms
+  o: number; // open
+  h: number; // high
+  l: number; // low
+  c: number; // close
+  v?: number; // volume
 };
 
 export type Quote = {
@@ -21,10 +19,10 @@ export type Quote = {
 
 export type Stats = {
   marketCap: number;
-  peRatio: number;     // may be 0 if unavailable
-  week52High: number;  // may be 0 if unavailable
-  week52Low: number;   // may be 0 if unavailable
-  volume: number;      // may be 0 if unavailable
+  peRatio: number;
+  week52High: number;
+  week52Low: number;
+  volume: number;
 };
 
 export type StockResponse = {
@@ -32,6 +30,6 @@ export type StockResponse = {
   symbol: string;
   quote: Quote;
   stats: Stats;
-  daily: Candle[];     // can be []
+  daily: Candle[];
   _meta: { ts: number };
 };

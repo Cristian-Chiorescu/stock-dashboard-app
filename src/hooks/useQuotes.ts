@@ -2,15 +2,15 @@ import { useEffect, useRef, useState } from "react";
 
 export type QuoteRow = {
   symbol: string;
-  name?: string; // optional (we'll fill from a map)
+  name?: string;
   price: number | null;
   change: number | null;
   percentChange: number | null;
 };
 
 type Options = {
-  refreshMs?: number;   // default 60s
-  namesMap?: Record<string, string>; // optional map for company names
+  refreshMs?: number;
+  namesMap?: Record<string, string>;
 };
 
 export function useQuotes(symbols: string[], opts: Options = {}) {
@@ -33,16 +33,18 @@ export function useQuotes(symbols: string[], opts: Options = {}) {
 
     try {
       const params = new URLSearchParams({ symbols: symbols.join(",") });
-      const res = await fetch(`/.netlify/functions/getQuotes?${params.toString()}`, {
-        headers: { Accept: "application/json" },
-        cache: "no-store",
-        signal: controller.signal,
-      });
+      const res = await fetch(
+        `/.netlify/functions/getQuotes?${params.toString()}`,
+        {
+          headers: { Accept: "application/json" },
+          cache: "no-store",
+          signal: controller.signal,
+        }
+      );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const incoming = (json?.rows ?? []) as QuoteRow[];
 
-      // decorate with names (if provided)
       const decorated = incoming.map((r) => ({
         ...r,
         name: namesMap[r.symbol] ?? r.name ?? "",
@@ -58,23 +60,21 @@ export function useQuotes(symbols: string[], opts: Options = {}) {
   }
 
   useEffect(() => {
-  loadOnce();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []);
+    loadOnce();
+  }, []);
 
-  // initial & on symbols change
   useEffect(() => {
-    const key = JSON.stringify(symbols.map((s) => s.trim().toUpperCase()).sort());
+    const key = JSON.stringify(
+      symbols.map((s) => s.trim().toUpperCase()).sort()
+    );
     if (key !== lastSymbolsRef.current) {
       lastSymbolsRef.current = key;
       setLoading(true);
       loadOnce();
     }
     return () => abortRef.current?.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(symbols)]);
 
-  // polling
   useEffect(() => {
     if (!refreshMs) return;
     timerRef.current = window.setInterval(() => {
@@ -83,11 +83,9 @@ export function useQuotes(symbols: string[], opts: Options = {}) {
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshMs, JSON.stringify(symbols)]);
 
   const refresh = () => loadOnce();
 
   return { rows, loading, error, refresh };
 }
-
