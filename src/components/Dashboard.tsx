@@ -1,7 +1,7 @@
-import { mockStockDetails } from "./mockData";
+// import { mockStockDetails } from "./mockData";
 
-import MainChart from "./MainChart";
-import StatisticsCard from "./StatisticsCard";
+// import MainChart from "./MainChart";
+// import StatisticsCard from "./StatisticsCard";
 
 import { useStock } from "../hooks/useStock";
 import KeyInfoCardLive from "./KeyInfoCardLive";
@@ -27,14 +27,18 @@ const Dashboard = ({ symbol, setSymbol }: DashboardProps) => {
     refresh,
   } = useStock(symbol, {
     refreshMs: 60000,
+    clearOnSymbolChange: true,
   });
 
-  const data = mockStockDetails[symbol];
+  // const data = mockStockDetails[symbol];
 
   const livePoints = (live?.daily ?? []).filter((d) => Number.isFinite(d?.c));
   const hasLiveDaily = livePoints.length >= 2;
-  const hasMock = !!data;
-  const isLoading = status === "idle" || status === "loading";
+  // const hasMock = !!data;
+  // const isLoading = status === "idle" || status === "loading";
+  const notFound =
+    status === "error" &&
+    /\b(404|not\s*found|Stock symbol '.*' not found)\b/i.test(error ?? "");
   const liveStatsReady =
     !!live?.stats &&
     ((live.stats.marketCap ?? 0) !== 0 ||
@@ -47,9 +51,13 @@ const Dashboard = ({ symbol, setSymbol }: DashboardProps) => {
     <div className="max-w-screen-xl mx-auto p-4 md:p-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 flex flex-col gap-6">
-          {isLoading && !live ? (
-            <KeyInfoCardSkeleton />
-          ) : (
+          {notFound ? (
+            <div className="bg-black/10 backdrop-blur-lg rounded-xl shadow-lg border border-white/10 p-6 text-sm text-gray-300">
+              Couldn’t find a stock with symbol{" "}
+              <span className="font-semibold">{symbol.toUpperCase()}</span>. Try
+              another ticker (e.g., AAPL) or pick one from the watchlist.
+            </div>
+          ) : hasLiveDaily ? (
             <KeyInfoCardLive
               data={live}
               status={status}
@@ -57,43 +65,28 @@ const Dashboard = ({ symbol, setSymbol }: DashboardProps) => {
               lastUpdated={lastUpdated}
               onRefresh={refresh}
             />
+          ) : (
+            <KeyInfoCardSkeleton />
           )}
 
-          {hasLiveDaily ? (
-            <>
-              <MainChartLive symbol={live!.symbol} daily={livePoints} />
-            </>
-          ) : isLoading ? (
+          {notFound ? (
+            <div className="bg-black/10 backdrop-blur-lg rounded-xl shadow-lg border border-white/10 p-6 text-sm text-gray-300">
+              No chart available because the ticker was not found.
+            </div>
+          ) : hasLiveDaily ? (
+            <MainChartLive symbol={live!.symbol} daily={livePoints} />
+          ) : (
             <ChartSkeleton />
-          ) : hasMock ? (
-            <>
-              <MainChart chartData={data.chart} />
-            </>
-          ) : (
-            <div
-              className="bg-black/10 backdrop-blur-lg rounded-xl shadow-lg
-        border border-white/10
-        p-6"
-            >
-              Chart source: NONE (no live candles / no mock)
-            </div>
           )}
 
-          {liveStatsReady ? (
-            <StatisticsCardLive stats={live!.stats} />
-          ) : isLoading ? (
-            <StatsCardSkeleton />
-          ) : hasMock ? (
-            <StatisticsCard stats={data.stats} />
-          ) : (
-            <div
-              className="bg-black/10 backdrop-blur-lg rounded-xl shadow-lg
-        border border-white/10
-        p-6"
-            >
-              Live stats unavailable for this symbol on the current provider.
-              Try another ticker or refresh later.
+          {notFound ? (
+            <div className="bg-black/10 backdrop-blur-lg rounded-xl shadow-lg border border-white/10 p-6 text-sm text-gray-300">
+              No statistics because the ticker was not found.
             </div>
+          ) : liveStatsReady ? (
+            <StatisticsCardLive stats={live!.stats} />
+          ) : (
+            <StatsCardSkeleton />
           )}
         </div>
         <div className="md:col-span-1">
